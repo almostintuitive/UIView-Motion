@@ -11,6 +11,8 @@
 
 @interface ViewController ()
 
+@property UIView *blackView;
+
 @end
 
 @implementation ViewController
@@ -19,15 +21,20 @@
     [super viewDidLoad];
     
 
-    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap)];
+    [self.view addGestureRecognizer:tap];
 }
 
 
 - (void)viewDidAppear:(BOOL)animated {
-    UIView *blackView = [[UIView alloc] initWithFrame:CGRectMake(100, 100, 100, 100)];
-    blackView.backgroundColor = [UIColor blackColor];
-    [self.view addSubview:blackView withAnimationType:MotionTypeSlideInFromBottomAndFadeIn];
+    self.blackView = [[UIView alloc] initWithFrame:CGRectMake(100, 100, 100, 100)];
+    self.blackView.backgroundColor = [UIColor blackColor];
+    [self.view addSubview:self.blackView withAnimationType:MotionTypeSlideInFromBottomAndFadeIn];
     
+}
+
+- (void)tap {
+    [self.blackView removeFromSuperviewWithAnimationType:MotionTypeSlideOutToBottom];
 }
 
 @end
