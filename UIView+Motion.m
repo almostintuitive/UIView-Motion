@@ -8,6 +8,11 @@
 
 #import "UIView+Motion.h"
 
+float const springSpeed = 1;
+float const springBounciness = 1;
+
+
+
 @implementation UIView (Motion)
 
 
@@ -26,80 +31,208 @@
 }
 
 - (void)addSubview:(UIView *)view withAnimationType:(MotionType)type delay:(NSTimeInterval)delay completionBlock:(void (^)(void))completionBlock {
-    
-    if (type == MotionTypeFadeIn) {
-        [self addSubview:view withPreparationBlock:^(UIView *view) {
-            view.alpha = 0;
-        } customAnimation:^(UIView *view) {
-            view.spring.alpha = 1;
-        } delay:delay completionBlock:^{
-            if (completionBlock) completionBlock();
-        }];
-    } else if (type == MotionTypeSlideUpAndFadeIn) {
-        CGPoint originalCenterPoint = view.center;
-        CGFloat originalAlpha = view.alpha;
-        [self addSubview:view withPreparationBlock:^(UIView *view) {
-            view.alpha = 0;
-            view.center = CGPointMake(view.center.x, view.center.y+1000);
-        } customAnimation:^(UIView *view) {
-            view.spring.alpha = originalAlpha   ;
-            view.spring.center = originalCenterPoint;
-        } delay:delay completionBlock:^{
-            if (completionBlock) completionBlock();
-        }];
-    } else if (type == MotionTypeSlideUp) {
-        CGPoint originalCenterPoint = view.center;
-        [self addSubview:view withPreparationBlock:^(UIView *view) {
-            view.center = CGPointMake(view.center.x, view.center.y+1000);
-        } customAnimation:^(UIView *view) {
-            view.spring.center = originalCenterPoint;
-        } delay:delay completionBlock:^{
-            if (completionBlock) completionBlock();
-        }];
-    } else if (type == MotionTypeSlideInFromRightAndFadeIn) {
-        CGPoint originalCenterPoint = view.center;
-        CGFloat originalAlpha = view.alpha;
-        [self addSubview:view withPreparationBlock:^(UIView *view) {
-            view.alpha = 0;
-            view.center = CGPointMake(view.center.x+1000, view.center.y);
-        } customAnimation:^(UIView *view) {
-            view.spring.alpha = originalAlpha;
-            view.spring.center = originalCenterPoint;
-        } delay:delay completionBlock:^{
-            if (completionBlock) completionBlock();
-        }];
-    }
+    [self addSubview:view];
+    [view animateWithType:type delay:delay completionBlock:completionBlock];
 }
 
 
-- (void)addSubview:(UIView *)view withPreparationBlock:(void (^)(UIView *view))preparationBlock customAnimation:(void (^)(UIView *view))animationBlock delay:(NSTimeInterval)delay completionBlock:(void (^)(void))completionBlock {
-    if (preparationBlock) preparationBlock(view);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delay * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [self addSubview:view];
-        [NSObject animate:^{
-            if (animationBlock) animationBlock(view);
-        } completion:^(BOOL finished) {
-            if (completionBlock) completionBlock();
-        }];
-    });
+
+#pragma mark - removeFromSuperview methods
+
+- (void)removeFromSuperviewWithAnimationType:(MotionType)type {
+    [self removeFromSuperviewWithAnimationType:type delay:0];
 }
+
+- (void)removeFromSuperviewWithAnimationType:(MotionType)type delay:(NSTimeInterval)delay {
+    [self animateWithType:type delay:delay completionBlock:^{
+        [self removeFromSuperview];
+    }];
+}
+
+
+
 
 
 #pragma mark - animation methods
 
 - (void)animateWithType:(MotionType)type {
-    [self animateWithType:type delay:0];
+    [self animateWithType:type delay:0 completionBlock:nil];
 }
 
 - (void)animateWithType:(MotionType)type delay:(NSTimeInterval)delay {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delay * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        if (type == MotionTypeFallDown) {
-            self.spring.springSpeed = 5;
-            self.spring.center = CGPointMake(self.center.x, self.center.y+1000);
-        } else if (type == MotionTypeFadeOut) {
-            self.spring.alpha = 0;
-        }
-    });
+    [self animateWithType:type delay:delay completionBlock:nil];
 }
+
+
+- (void)animateWithType:(MotionType)type delay:(NSTimeInterval)delay completionBlock:(void (^)(void))completionBlock {
+    
+    
+    if (type == MotionTypeFadeIn) {
+        POPSpringAnimation *alphaAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPViewAlpha];
+        alphaAnimation.fromValue = @(0);
+        alphaAnimation.toValue = @(self.alpha);
+        alphaAnimation.springSpeed = springSpeed;
+        alphaAnimation.springBounciness = springBounciness;
+        alphaAnimation.beginTime = CACurrentMediaTime()+delay;
+        [alphaAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+        [self pop_addAnimation:alphaAnimation forKey:@"fadeIn"];
+        
+    } else if (type == MotionTypeFadeOut) {
+        
+        POPSpringAnimation *alphaAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPViewAlpha];
+        alphaAnimation.toValue = @(0);
+        alphaAnimation.springSpeed = springSpeed;
+        alphaAnimation.springBounciness = springBounciness;
+        alphaAnimation.beginTime = CACurrentMediaTime()+delay;
+        [alphaAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+        [self pop_addAnimation:alphaAnimation forKey:@"fadeOut"];
+
+    } else if (type == MotionTypeSlideInFromLeft) {
+        
+        POPSpringAnimation *slideAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPViewCenter];
+        slideAnimation.fromValue = [NSValue valueWithCGPoint:CGPointMake(self.center.x-[UIScreen mainScreen].bounds.size.width, self.center.y)];
+        slideAnimation.toValue = [NSValue valueWithCGPoint:self.center];
+        slideAnimation.springSpeed = springSpeed;
+        slideAnimation.springBounciness = springBounciness;
+        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+        [self pop_addAnimation:slideAnimation forKey:@"slideInFromLeft"];
+
+        
+        
+    } else if (type == MotionTypeSlideInFromRight) {
+        
+        POPSpringAnimation *slideAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPViewCenter];
+        slideAnimation.fromValue = [NSValue valueWithCGPoint:CGPointMake(self.center.x+[UIScreen mainScreen].bounds.size.width, self.center.y)];
+        slideAnimation.toValue = [NSValue valueWithCGPoint:self.center];
+        slideAnimation.springSpeed = springSpeed;
+        slideAnimation.springBounciness = springBounciness;
+        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+        [self pop_addAnimation:slideAnimation forKey:@"slideInFromRight"];
+        
+        
+    } else if (type == MotionTypeSlideInFromTop) {
+        
+        POPSpringAnimation *slideAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPViewCenter];
+        slideAnimation.fromValue = [NSValue valueWithCGPoint:CGPointMake(self.center.x, self.center.y-[UIScreen mainScreen].bounds.size.height)];
+        slideAnimation.toValue = [NSValue valueWithCGPoint:self.center];
+        slideAnimation.springSpeed = springSpeed;
+        slideAnimation.springBounciness = springBounciness;
+        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+        [self pop_addAnimation:slideAnimation forKey:@"slideInFromTop"];
+
+        
+    
+    } else if (type == MotionTypeSlideInFromBottom) {
+        
+        POPSpringAnimation *slideAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPViewCenter];
+        slideAnimation.fromValue = [NSValue valueWithCGPoint:CGPointMake(self.center.x, self.center.y+[UIScreen mainScreen].bounds.size.height)];
+        slideAnimation.toValue = [NSValue valueWithCGPoint:self.center];
+        slideAnimation.springSpeed = springSpeed;
+        slideAnimation.springBounciness = springBounciness;
+        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+        [self pop_addAnimation:slideAnimation forKey:@"slideInFromBottom"];
+        
+        
+        
+    } else if (type == MotionTypeSlideOutToLeft) {
+        
+        POPSpringAnimation *slideAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPViewCenter];
+        slideAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(self.center.x-[UIScreen mainScreen].bounds.size.width, self.center.y)];
+        slideAnimation.springSpeed = springSpeed;
+        slideAnimation.springBounciness = springBounciness;
+        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+        [self pop_addAnimation:slideAnimation forKey:@"slideOutToLeft"];
+        
+        
+    } else if (type == MotionTypeSlideOutToRight) {
+        
+        POPSpringAnimation *slideAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPViewCenter];
+        slideAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(self.center.x+[UIScreen mainScreen].bounds.size.width, self.center.y)];
+        slideAnimation.springSpeed = springSpeed;
+        slideAnimation.springBounciness = springBounciness;
+        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+        [self pop_addAnimation:slideAnimation forKey:@"slideOutToRight"];
+        
+        
+    } else if (type == MotionTypeSlideOutToTop) {
+        
+        POPSpringAnimation *slideAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPViewCenter];
+        slideAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(self.center.x, self.center.y-[UIScreen mainScreen].bounds.size.height)];
+        slideAnimation.springSpeed = springSpeed;
+        slideAnimation.springBounciness = springBounciness;
+        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+        [self pop_addAnimation:slideAnimation forKey:@"slideOutToTop"];
+        
+        
+    } else if (type == MotionTypeSlideOutToBottom) {
+        
+        POPSpringAnimation *slideAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPViewCenter];
+        slideAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(self.center.x, self.center.y+[UIScreen mainScreen].bounds.size.height)];
+        slideAnimation.springSpeed = springSpeed;
+        slideAnimation.springBounciness = springBounciness;
+        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+        [self pop_addAnimation:slideAnimation forKey:@"slideOutToBottom"];
+        
+        
+    } else if (type == MotionTypeSlideInFromBottomAndFadeIn) {
+        [self animateWithType:MotionTypeFadeIn delay:delay completionBlock:nil];
+        [self animateWithType:MotionTypeSlideInFromBottom delay:delay completionBlock:completionBlock];
+        
+    }
+    
+    
+}
+
+
+
+
 
 @end

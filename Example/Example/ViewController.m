@@ -26,7 +26,7 @@
 - (void)viewDidAppear:(BOOL)animated {
     UIView *blackView = [[UIView alloc] initWithFrame:CGRectMake(100, 100, 100, 100)];
     blackView.backgroundColor = [UIColor blackColor];
-    [self.view addSubview:blackView withAnimationType:MotionTypeSlideUpAndFadeIn];
+    [self.view addSubview:blackView withAnimationType:MotionTypeSlideInFromBottomAndFadeIn];
     
 }
 
