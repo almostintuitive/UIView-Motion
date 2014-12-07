@@ -8,13 +8,12 @@
 
 #import "UIView+Motion.h"
 
-float const springSpeed = 1;
+float const springSpeed = 20;
 float const springBounciness = 1;
 
 
 
 @implementation UIView (Motion)
-
 
 #pragma mark - addSubview methods
 
@@ -31,8 +30,10 @@ float const springBounciness = 1;
 }
 
 - (void)addSubview:(UIView *)view withAnimationType:(MotionType)type delay:(NSTimeInterval)delay completionBlock:(void (^)(void))completionBlock {
-    [self addSubview:view];
-    [view animateWithType:type delay:delay completionBlock:completionBlock];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delay * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [self addSubview:view];
+        [view animateWithType:type delay:0 completionBlock:completionBlock];
+    });
 }
 
 
@@ -73,7 +74,9 @@ float const springBounciness = 1;
         alphaAnimation.toValue = @(self.alpha);
         alphaAnimation.springSpeed = springSpeed;
         alphaAnimation.springBounciness = springBounciness;
-        alphaAnimation.beginTime = CACurrentMediaTime()+delay;
+        if (delay != 0) {
+            alphaAnimation.beginTime = CACurrentMediaTime()+delay;
+        }
         [alphaAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
             if (completionBlock) {
                 completionBlock();
@@ -87,7 +90,9 @@ float const springBounciness = 1;
         alphaAnimation.toValue = @(0);
         alphaAnimation.springSpeed = springSpeed;
         alphaAnimation.springBounciness = springBounciness;
-        alphaAnimation.beginTime = CACurrentMediaTime()+delay;
+        if (delay != 0) {
+            alphaAnimation.beginTime = CACurrentMediaTime()+delay;
+        }
         [alphaAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
             if (completionBlock) {
                 completionBlock();
@@ -102,7 +107,9 @@ float const springBounciness = 1;
         slideAnimation.toValue = [NSValue valueWithCGPoint:self.center];
         slideAnimation.springSpeed = springSpeed;
         slideAnimation.springBounciness = springBounciness;
-        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        if (delay != 0) {
+            slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        }
         [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
             if (completionBlock) {
                 completionBlock();
@@ -119,7 +126,9 @@ float const springBounciness = 1;
         slideAnimation.toValue = [NSValue valueWithCGPoint:self.center];
         slideAnimation.springSpeed = springSpeed;
         slideAnimation.springBounciness = springBounciness;
-        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        if (delay != 0) {
+            slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        }
         [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
             if (completionBlock) {
                 completionBlock();
@@ -135,7 +144,9 @@ float const springBounciness = 1;
         slideAnimation.toValue = [NSValue valueWithCGPoint:self.center];
         slideAnimation.springSpeed = springSpeed;
         slideAnimation.springBounciness = springBounciness;
-        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        if (delay != 0) {
+            slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        }
         [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
             if (completionBlock) {
                 completionBlock();
@@ -152,7 +163,9 @@ float const springBounciness = 1;
         slideAnimation.toValue = [NSValue valueWithCGPoint:self.center];
         slideAnimation.springSpeed = springSpeed;
         slideAnimation.springBounciness = springBounciness;
-        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        if (delay != 0) {
+            slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        }
         [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
             if (completionBlock) {
                 completionBlock();
@@ -168,7 +181,9 @@ float const springBounciness = 1;
         slideAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(self.center.x-[UIScreen mainScreen].bounds.size.width, self.center.y)];
         slideAnimation.springSpeed = springSpeed;
         slideAnimation.springBounciness = springBounciness;
-        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        if (delay != 0) {
+            slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        }
         [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
             if (completionBlock) {
                 completionBlock();
@@ -183,7 +198,9 @@ float const springBounciness = 1;
         slideAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(self.center.x+[UIScreen mainScreen].bounds.size.width, self.center.y)];
         slideAnimation.springSpeed = springSpeed;
         slideAnimation.springBounciness = springBounciness;
-        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        if (delay != 0) {
+            slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        }
         [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
             if (completionBlock) {
                 completionBlock();
@@ -198,7 +215,9 @@ float const springBounciness = 1;
         slideAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(self.center.x, self.center.y-[UIScreen mainScreen].bounds.size.height)];
         slideAnimation.springSpeed = springSpeed;
         slideAnimation.springBounciness = springBounciness;
-        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        if (delay != 0) {
+            slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        }
         [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
             if (completionBlock) {
                 completionBlock();
@@ -213,7 +232,9 @@ float const springBounciness = 1;
         slideAnimation.toValue = [NSValue valueWithCGPoint:CGPointMake(self.center.x, self.center.y+[UIScreen mainScreen].bounds.size.height)];
         slideAnimation.springSpeed = springSpeed;
         slideAnimation.springBounciness = springBounciness;
-        slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        if (delay != 0) {
+            slideAnimation.beginTime = CACurrentMediaTime()+delay;
+        }
         [slideAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
             if (completionBlock) {
                 completionBlock();
@@ -223,9 +244,43 @@ float const springBounciness = 1;
         
         
     } else if (type == MotionTypeSlideInFromBottomAndFadeIn) {
+        
         [self animateWithType:MotionTypeFadeIn delay:delay completionBlock:nil];
         [self animateWithType:MotionTypeSlideInFromBottom delay:delay completionBlock:completionBlock];
         
+    } else if (type == MotionTypeZoomIn) {
+        
+        POPSpringAnimation *alphaAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPViewScaleXY];
+        alphaAnimation.fromValue = [NSValue valueWithCGPoint: CGPointMake(0, 0)];
+        alphaAnimation.toValue = [NSValue valueWithCGPoint: CGPointMake(1, 1)];
+        alphaAnimation.springSpeed = springSpeed;
+        alphaAnimation.springBounciness = 5;
+        if (delay != 0) {
+            alphaAnimation.beginTime = CACurrentMediaTime()+delay;
+        }
+        [alphaAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+        [self pop_addAnimation:alphaAnimation forKey:@"zoomIn"];
+        
+        
+    } else if (type == MotionTypeZoomIn) {
+        
+        POPSpringAnimation *alphaAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPViewScaleXY];
+        alphaAnimation.toValue = [NSValue valueWithCGPoint: CGPointMake(0, 0)];
+        alphaAnimation.springSpeed = springSpeed;
+        alphaAnimation.springBounciness = 5;
+        if (delay != 0) {
+            alphaAnimation.beginTime = CACurrentMediaTime()+delay;
+        }
+        [alphaAnimation setCompletionBlock:^(POPAnimation *anim, BOOL finished) {
+            if (completionBlock) {
+                completionBlock();
+            }
+        }];
+        [self pop_addAnimation:alphaAnimation forKey:@"zoomOut"];
     }
     
     

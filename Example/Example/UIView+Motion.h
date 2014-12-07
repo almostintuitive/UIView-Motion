@@ -24,7 +24,10 @@ typedef enum MotionType : NSUInteger {
     MotionTypeSlideOutToTop = 8,
     MotionTypeSlideOutToBottom = 9,
     
-    MotionTypeSlideInFromBottomAndFadeIn = 10
+    MotionTypeSlideInFromBottomAndFadeIn = 10,
+    
+    MotionTypeZoomIn = 11,
+    MotionTypeZoomOut = 12
 
 } MotionType;
 
