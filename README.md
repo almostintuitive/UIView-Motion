@@ -3,7 +3,6 @@ UIView helper category to add animation on addSubview & removeFromSuperView with
 
 Easy peasy.
 
-Basic animations can be used to interpolate values over a specified time period. To use an ease-in ease-out animation to animate a view's alpha from 0.0 to 1.0 over the default duration:
 ```objective-c
 [self.view addSubview:self.viewToAdd withAnimationType:MotionTypeSlideInFromLeft];
 
