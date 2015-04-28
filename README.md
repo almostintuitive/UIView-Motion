@@ -20,8 +20,6 @@ Don't even try to make it work with AutoLayout :)
 
 ## Animation types
 
-A collection of links to external resources that may prove valuable:
-
 * FadeIn
 * FadeOut
 
