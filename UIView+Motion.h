@@ -1,13 +1,15 @@
 //
-//  UIView+AnimationHelper.h
-//  Drops
+//  UIView+Motion.h
 //
-//  Created by mark on 29/09/2014.
+//  UIView categories to add animation on addSubview & removeFromSuperView.
+//  Uses facebook pop.
+//  https://github.com/itchingpixels/UIView-Motion
+//
+//  Created by Mark Szulyovszky on 29/09/2014.
 //
 //
 
 #import <UIKit/UIKit.h>
-#import <pop/POP.h>
 
 typedef enum MotionType : NSUInteger {
     

@@ -1,12 +1,17 @@
 //
-//  UIView+AnimationHelper.m
-//  Drops
+//  UIView+Motion.h
 //
-//  Created by mark on 29/09/2014.
+//  UIView categories to add animation on addSubview & removeFromSuperView.
+//  Uses facebook pop.
+//  https://github.com/itchingpixels/UIView-Motion
+//
+//  Created by Mark Szulyovszky on 29/09/2014.
 //
 //
 
 #import "UIView+Motion.h"
+#import <pop/POP.h>
+
 
 float const springSpeed = 20;
 float const springBounciness = 1;
@@ -266,7 +271,7 @@ float const springBounciness = 1;
         [self pop_addAnimation:alphaAnimation forKey:@"zoomIn"];
         
         
-    } else if (type == MotionTypeZoomIn) {
+    } else if (type == MotionTypeZoomOut) {
         
         POPSpringAnimation *alphaAnimation = [POPSpringAnimation animationWithPropertyNamed:kPOPViewScaleXY];
         alphaAnimation.toValue = [NSValue valueWithCGPoint: CGPointMake(0, 0)];
